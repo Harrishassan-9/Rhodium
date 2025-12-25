@@ -678,7 +678,13 @@
             }
 
             .nav-label {
-                display: none;
+                display: block;
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                color: var(--text-muted);
+                margin-bottom: 8px;
+                padding: 0;
             }
 
             .nav-item {
@@ -760,7 +766,13 @@
             }
 
             .nav-section {
-                display: none;
+                display: block;
+                width: 100%;
+                margin-bottom: 15px;
+                padding: 15px;
+                background: rgba(56, 189, 248, 0.05);
+                border-radius: 10px;
+                border: 1px solid rgba(56, 189, 248, 0.2);
             }
 
             .nav-section:nth-child(2) {
@@ -922,11 +934,14 @@
                 border-left: none;
                 border-top: 3px solid var(--accent);
                 padding-top: 10px;
+                grid-column: 1;
+                width: 100%;
             }
 
             .stats-mini {
                 grid-column: auto;
                 padding: 10px;
+                width: 100%;
             }
 
             .stats-grid {
@@ -939,6 +954,35 @@
 
             .stat-label {
                 font-size: 0.6rem;
+            }
+
+            .nav-section {
+                display: block;
+                width: 100%;
+                margin-bottom: 12px;
+                padding: 12px;
+                background: rgba(56, 189, 248, 0.05);
+                border-radius: 8px;
+                border: 1px solid rgba(56, 189, 248, 0.15);
+            }
+
+            .nav-label {
+                display: block;
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                margin-bottom: 8px;
+                padding: 0;
+            }
+
+            .nav-item {
+                display: block;
+                width: 100%;
+                padding: 10px 8px;
+                font-size: 0.75rem;
+                margin-bottom: 6px;
+                text-align: left;
             }
 
             .main {
