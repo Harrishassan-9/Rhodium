@@ -628,9 +628,15 @@
 
         /* ========== MOBILE RESPONSIVE STYLES ========== */
         @media (max-width: 1024px) {
+            html, body {
+                height: auto;
+                overflow-y: auto;
+            }
+
             body {
                 flex-direction: column;
-                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
             }
 
             .sidebar {
@@ -642,6 +648,7 @@
                 grid-template-columns: auto 1fr auto;
                 align-items: center;
                 gap: 20px;
+                flex-shrink: 0;
             }
 
             .logo {
@@ -682,8 +689,11 @@
 
             .main {
                 padding: 20px;
-                overflow-y: auto;
+                overflow-y: visible;
+                overflow-x: hidden;
                 min-height: auto;
+                flex-grow: 1;
+                width: 100%;
             }
 
             header {
@@ -730,11 +740,13 @@
         @media (max-width: 768px) {
             body {
                 background: linear-gradient(135deg, var(--bg-dark) 0%, #1e1b4b 100%);
+                overflow-x: hidden;
             }
 
             .sidebar {
                 grid-template-columns: 1fr;
                 gap: 15px;
+                padding: 12px;
             }
 
             .logo {
@@ -764,6 +776,9 @@
 
             .main {
                 padding: 15px;
+                overflow-y: visible;
+                overflow-x: hidden;
+                width: 100%;
             }
 
             h1 {
@@ -894,6 +909,9 @@
             .sidebar {
                 grid-template-columns: 1fr;
                 padding: 12px;
+                gap: 8px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .logo {
@@ -925,6 +943,9 @@
 
             .main {
                 padding: 12px;
+                overflow-y: visible;
+                overflow-x: hidden;
+                width: 100%;
             }
 
             h1 {
