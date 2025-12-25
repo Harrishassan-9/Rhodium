@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="version" content="2.0">
+    <title>SOTA Tower - Executive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                darkMode: true,
+                background: '#1e293b',
+                primaryColor: '#38bdf8',
+                secondaryColor: '#818cf8',
+                tertiaryColor: '#34d399',
+                primaryBorderColor: '#38bdf8',
+                textColor: '#f8fafc',
+                axisFormat: '%b',
+                titleColor: '#f8fafc'
+            },
+            gantt: {
+                barHeight: 22,
+                barGap: 6,
+                fontSize: 13,
+                sectionFontSize: 15,
+                padding: 15,
+                numberSectionStyles: 4,
+            }
+        });
+
+        // Re-render mermaid when tabs switch
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addHoverEffects();
+            }, 1000);
+        });
+    </script>
+    <style>
+        :root {
+            --bg-dark: #0a0e1a;
+            --panel-bg: #1e293b;
+            --sidebar-bg: #020617;
+            --accent: #38bdf8;
+            --accent-purple: #818cf8;
+            --accent-green: #34d399;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #34d399;
+            --warning: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 50px;
+            padding-left: 15px;
+            border-left: 5px solid var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding-left: 15px;
+        }
+
+        .nav-item {
+            padding: 14px 18px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--accent);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--text-main);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0.05) 100%);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        /* Main Content */
+        .main {
+            flex-grow: 1;
+            padding: 40px 50px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .main::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .main::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+            line-height: 1.2;
+        }
+
+        h1 span {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .status-pill {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--success);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.2);
+        }
+
+        .status-pill::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Views */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .view-section.active-view {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-badge {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            background: rgba(129, 140, 248, 0.2);
+            color: var(--accent-purple);
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        /* Checklist */
+        .checklist {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .checklist-section {
+            margin-bottom: 25px;
+        }
+
+        .checklist-section h4 {
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checklist-section h4::before {
+            content: '▸';
+            color: var(--accent-purple);
+        }
+
+        .check-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 3px solid var(--border);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        .check-item:hover {
+            border-left-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+            transform: translateX(5px);
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox:hover {
+            background: rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Mermaid chart container */
+        .chart-wrapper {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .chart-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .chart-wrapper::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .chart-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* Grid Layout for Complex Views */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Phase Headers */
+        .phase-header {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 30px 0 15px 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .phase-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .phase-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* Interactive Timeline Info Box */
+        .timeline-info {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--panel-bg);
+            border: 1px solid var(--accent);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 250px;
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .timeline-info.visible {
+            opacity: 1;
+        }
+
+        .timeline-info h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .timeline-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">RHODIUM</div>
+
+        <div class="nav-section">
+            <div class="nav-label">Project Overview</div>
+            <div class="nav-item active" onclick="switchTab('master')">
+                <span>Master Schedule</span>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Unit Breakdown</div>
+            <div class="nav-item" onclick="switchTab('bathroom')">
+                <span>🚿 Luxury Bathroom</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('bedroom')">
+                <span>🛏️ Master Bedroom</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('living')">
+                <span>🛋️ Living & Dining</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('kitchen')">
+                <span>🍳 Designer Kitchen</span>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Infrastructure</div>
+            <div class="nav-item" onclick="switchTab('mep')">
+                <span>⚡ MEP Systems</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('amenities')">
+                <span>🏊 Amenities (L7)</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <header>
+            <div>
+                <h1>Project <span>Recovery Plan</span></h1>
+                <div class="meta">
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Target: December 2026 | Days Remaining:
+                        371</div>
+                </div>
+            </div>
+            <div class="status-pill">ON TRACK</div>
+        </header>
+
+        <!-- Timeline Info Box (appears on hover) -->
+        <div class="timeline-info" id="timelineInfo">
+            <h4>Timeline Details</h4>
+            <p id="infoContent">Hover over any chart element to see details</p>
+        </div>
+
+        <!-- TAB 1: MASTER SCHEDULE -->
+        <div id="master" class="view-section active-view">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Project Phasing Overview</span>
+                    <span class="card-badge">12 Months</span>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        dateFormat YYYY-MM-DD
+                        axisFormat %b %y
+
+                        section Foundation Works
+                        Lifts Mechanical Complete :active, 2025-12-01, 2026-03-15
+                        MEP Basement Termination :2026-01-01, 2026-02-28
+
+                        section Vertical Phasing
+                        Floors 8-12 MEP + Finishes :crit, 2026-02-01, 2026-08-30
+                        Floors 13-17 MEP + Finishes :crit, 2026-03-01, 2026-09-30
+                        Floors 18-22 MEP + Finishes :crit, 2026-04-01, 2026-10-30
+                        Penthouses (VIP Treatment) :2026-04-01, 2026-11-30
+
+                        section Critical Milestones
+                        Building Envelope Sealed :milestone, 2026-06-01, 0d
+                        Full Power On :milestone, 2026-10-01, 0d
+                        Civil Defense Approval :milestone, 2026-11-15, 0d
+                        Handover :milestone, 2026-12-31, 0d
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: LUXURY BATHROOM (ULTRA DETAILED) -->
+        <div id="bathroom" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🚿 Luxury Bathroom - Complete Workflow</span>
+                    <span class="card-badge">10 Weeks Per Unit</span>
+                </div>
+
+                <div class="phase-header">
+                    <h3>Phase 1: Waterproofing & Infrastructure</h3>
+                    <p>Foundation of a leak-free luxury bathroom</p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Phase 1: Waterproofing & Drainage (Week 1-3)
+                        dateFormat YYYY-MM-DD
+                        axisFormat Day %d
+
+                        section Tanking System
+                        Full Liquid Membrane Application :2026-01-01, 2d
+                        Corner Tape/Mesh at Junctions :2026-01-03, 1d
+                        Second Coat Application :2026-01-04, 2d
+                        Curing Period (24hrs) :crit, 2026-01-06, 1d
+
+                        section Flood Testing
+                        Plug All Drains :2026-01-07, 1d
+                        Fill Floor with Water :2026-01-08, 1d
+                        48hr Observation Period :crit, 2026-01-09, 2d
+                        Drain & Inspection :2026-01-11, 1d
+
+                        section Piping & Drainage
+                        Hot/Cold Pressure Test (10 Bar) :crit, 2026-01-12, 1d
+                        Acoustic Wrap on Waste Pipes :2026-01-13, 2d
+                        Linear Drain Installation :2026-01-15, 2d
+                        Slope Gradient Verification (1:100) :2026-01-17, 1d
+
+                        section Concealed Cistern
+                        Steel Frame Bolting :2026-01-18, 1d
+                        Rigidity Load Test :crit, 2026-01-19, 1d
+                        Access Panel Framing :2026-01-20, 2d
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>Phase 2: Electrical & Smart Automation</h3>
+                    <p>IP65 zones, underfloor heating, mirror defoggers</p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Phase 2: Electrical & Comfort Tech (Week 3-4)
+                        dateFormat YYYY-MM-DD
+                        axisFormat Day %d
+
+                        section Smart Lighting
+                        IP65 Wet Zone Lights Rough-in :2026-01-22, 2d
+                        Niche LED Strip Channels :2026-01-24, 2d
+                        Toe-Kick Motion Sensor Install :2026-01-26, 1d
+                        High CRI Bulb Selection (>90) :2026-01-27, 1d
+
+                        section Comfort Systems
+                        Underfloor Heating Mat Laying :2026-01-28, 2d
+                        Thermostat Wiring :2026-01-30, 1d
+                        Mirror Defogger Pads Install :2026-01-31, 1d
+                        Hidden Shaver Socket Rough-in :2026-02-01, 1d
+
+                        section Ventilation
+                        Inline Fan Mounting (Ceiling) :2026-02-02, 2d
+                        High CFM Duct Routing :2026-02-04, 1d
+                        Acoustic Damper Installation :2026-02-05, 1d
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>Phase 3: Tiling & Premium Finishes</h3>
+                    <p>Mitered edges, epoxy grout, zero lippage</p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Phase 3: Tiling Perfection (Week 5-7)
+                        dateFormat YYYY-MM-DD
+                        axisFormat Day %d
+
+                        section Tile Prep
+                        Dry Layout Run (No Slivers) :2026-02-06, 2d
+                        Edge Grinding for Miters (45°) :2026-02-08, 2d
+                        Adhesive Mixing & Application :2026-02-10, 2d
+
+                        section Wall Tiling
+                        Shower Zone Tiling :2026-02-12, 5d
+                        Vanity Wall Tiling :2026-02-17, 3d
+                        Feature Wall (if any) :2026-02-20, 2d
+
+                        section Floor Tiling
+                        Floor Tile Setting :2026-02-22, 4d
+                        Lippage Check & Adjustment :crit, 2026-02-26, 1d
+                        Curing Period (48hrs) :2026-02-27, 2d
+
+                        section Grouting
+                        Epoxy Grout Application :2026-03-01, 2d
+                        Joint Cleaning & Tooling :2026-03-03, 2d
+                        Final Buffing & Haze Removal :2026-03-05, 1d
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>Phase 4: Fixtures & Fittings</h3>
+                    <p>Thermostatic valves, wall-hung WCs, rain showers</p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Phase 4: Fixture Installation (Week 7-9)
+                        dateFormat YYYY-MM-DD
+                        axisFormat Day %d
+
+                        section Shower Assembly
+                        Thermostatic Valve Install :2026-03-06, 2d
+                        Ceiling Rain Shower Mounting :2026-03-08, 2d
+                        Pressure Balancing Test :crit, 2026-03-10, 1d
+                        Hand Shower Bracket Install :2026-03-11, 1d
+
+                        section Vanity & Basin
+                        Steel Bracket Reinforcement :2026-03-12, 2d
+                        Heavy Stone Countertop Setting :2026-03-14, 3d
+                        Chrome Bottle Trap Install :2026-03-17, 1d
+                        Pop-up Waste Mechanism :2026-03-18, 1d
+
+                        section Wall-Hung WC
+                        Frame Height Adjustment (420mm) :2026-03-19, 1d
+                        WC Mounting & Leveling :2026-03-20, 2d
+                        Soft-Close Seat Damper Check :2026-03-22, 1d
+                        Health Faucet Install :2026-03-23, 1d
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>Phase 5: Glass & Final Hardware</h3>
+                    <p>Nano-coated glass, magnetic seals, minimal frames</p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Phase 5: Glass & Accessories (Week 9-10)
+                        dateFormat YYYY-MM-DD
+                        axisFormat Day %d
+
+                        section Shower Enclosure
+                        10mm Tempered Glass Template :2026-03-24, 2d
+                        Nano-Coating Application :2026-03-26, 1d
+                        Heavy-Duty Hinge/Clamp Install :2026-03-27, 2d
+                        Magnetic Seal Fitting :2026-03-29, 1d
+
+                        section Accessories
+                        Heated Towel Rail Hardwiring :2026-03-30, 2d
+                        Robe Hooks Placement :2026-04-01, 1d
+                        Ergonomic TP Holder Install :2026-04-02, 1d
+
+                        section Final Snagging
+                        Color-Matched Silicone Lines :2026-04-03, 2d
+                        Flow Test (All Taps Simultaneous) :crit, 2026-04-05, 1d
+                        Drainage Speed Test (Bucket) :crit, 2026-04-06, 1d
+                        Final White-Glove Clean :2026-04-07, 2d
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Checklist -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Quality Assurance Checklist</span>
+                </div>
+                <div class="checklist">
+                    <div class="checklist-section">
+                        <h4>Waterproofing (Tanking)</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Full "Tanking" System: Liquid rubber/membrane on entire floor +
+                            walls (1ft high, 7ft in shower)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Flood Test: 24-48 hours with plugged drains before tiling
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Corner Sealing: Specialized tape/mesh at wall-floor junctions
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Piping & Drainage</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Pressure Testing: All pipes (hot/cold) at 10 bar before wall
+                            closure
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Acoustic Insulation: Sound-dampening foam on waste pipes
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Slope Gradient: 1:100 ratio verification for rapid drainage
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Linear Drains: Installation of infinity drains (not center
+                            circles)
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Concealed Cisterns</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Frame Rigidity: Steel frame perfectly rigid (no flex when
+                            loaded)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Access Panel: Flush plate allows future mechanism access
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Lighting & Electrical</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>IP65 Rated Zones: Waterproof lights in wet zones (shower)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Niche Lighting: LED strips in shower niches with waterproof
+                            diffusers
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Toe-Kick Lighting: Motion-sensor LEDs under vanity
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>CRI Value: High Color Rendering Index bulbs (>90) for accurate
+                            grooming
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Comfort Technology</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Underfloor Heating: Electric mats under tiles with dedicated
+                            thermostat
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Mirror Defogger: Heating pads behind mirrors
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Shaver/Toothbrush Sockets: Hidden inside cabinets or integrated
+                            switchplates
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Exhaust: High-CFM silent inline fan in false ceiling
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Tile Setting Excellence</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Layout Dry Run: Ensure no "slivers" (tiny cut pieces) at edges
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Mitered Edges: 45° grinding at corners (no plastic trims)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Lippage Check: Adjacent tiles perfectly flush (no tripping
+                            hazards)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Epoxy Grout: Stain-proof, waterproof grout (not cement)
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Shower Installation</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Thermostatic Valve: Constant temperature regardless of building
+                            usage
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Rain Shower Head: Ceiling/high-wall mounted with pressure
+                            balancing
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Hand Shower: Separate wand for cleaning/hair washing
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Vanity & Basin</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Countertop Support: Steel brackets reinforced for heavy stone
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Bottle Trap: Chrome/PVD colored decorative P-trap
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Pop-up Waste: Ceramic top plugs matching basin material
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>WC (Toilet)</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Wall-Hung Unit: Mounted 400-420mm off floor
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Soft Close Seat: Damper hinges checked for slow closing
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Health Faucet/Bidet Spray: High-pressure hose with shut-off
+                            valve
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Shower Enclosure</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Tempered Glass: 8-10mm thickness minimum
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Nano-Coating: Hydrophobic treatment for water beading
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>U-Channels vs. Clamps: Minimalist heavy-duty hardware (no bulky
+                            frames)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Magnetic Seals: Watertight door gaskets
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h4>Final Snagging ("SOTA" Test)</h4>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Silicone Lines: Color-matched to grout, perfectly smooth tooling
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Flow Test: All taps + toilet flush simultaneously (check
+                            pressure drops)
+                        </div>
+                        <div class="check-item">
+                            <div class="checkbox"></div>Drainage Speed: Bucket of water should vanish immediately (no
+                            pooling)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: BEDROOM -->
+        <div id="bedroom" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🛏️ Master Bedroom Sequence</span>
+                    <span class="card-badge">8 Weeks</span>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Master Bedroom Complete Workflow
+                        dateFormat YYYY-MM-DD
+                        axisFormat Week %U
+
+                        section MEP Infrastructure
+                        Electrical Chasing & Backboxes :2026-04-01, 7d
+                        Data/AV Cabling (Smart Home) :2026-04-06, 5d
+                        AC Duct Rough-in :2026-04-08, 7d
+
+                        section Wall & Ceiling Prep
+                        Plastering & Skim Coat :2026-04-15, 7d
+                        False Ceiling Framing :2026-04-18, 7d
+                        Ceiling Gypsum Boarding :2026-04-25, 4d
+
+                        section Flooring
+                        Screed Leveling :2026-04-29, 4d
+                        Moisture Test :crit, 2026-05-03, 3d
+                        Premium Wood/Stone Install :2026-05-06, 7d
+
+                        section Fitted Joinery
+                        Wardrobe Carcass Assembly :2026-05-13, 7d
+                        Drawer Runners & Mechanisms :2026-05-20, 3d
+                        Door Hanging & Alignment :2026-05-23, 4d
+                        Internal LED Strips :2026-05-27, 2d
+
+                        section Painting & Finishes
+                        First Coat (Primer) :2026-05-21, 4d
+                        Second Coat (Finish) :2026-05-25, 4d
+                        Touch-ups & Snagging :2026-05-29, 2d
+
+                        section Final Electrical
+                        Switch Plates Install :2026-05-31, 2d
+                        Reading Light Hardwiring :2026-06-02, 2d
+                        Smart Panel Programming :2026-06-04, 2d
+
+                        section Soft Finishes
+                        Curtain Track & Pelmet :2026-06-06, 2d
+                        Acoustic Door Seals :2026-06-08, 1d
+                        Final Clean & Handover :2026-06-09, 1d
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: LIVING ROOM -->
+        <div id="living" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🛋️ Living & Dining Room</span>
+                    <span class="card-badge">9 Weeks</span>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Living & Dining Workflow
+                        dateFormat YYYY-MM-DD
+                        axisFormat Week %U
+
+                        section AV & Data
+                        Media Wall Structural Support :2026-06-10, 7d
+                        HDMI/CAT6 Conduit Embedding :2026-06-15, 7d
+                        Speaker Wire Rough-in :2026-06-20, 5d
+
+                        section HVAC
+                        Linear Slot Diffuser Framing :2026-06-25, 7d
+                        Duct Insulation & Hanging :2026-06-28, 7d
+                        Alignment with Lighting Plan :crit, 2026-07-05, 3d
+
+                        section Ceiling
+                        Cove Lighting Framing :2026-07-08, 7d
+                        Gypsum Closure :2026-07-15, 7d
+                        LED Cove Strip Install :2026-07-22, 3d
+
+                        section Flooring
+                        Screed & Leveling :2026-07-25, 7d
+                        Premium Marble/Wood Install :2026-08-01, 8d
+                        Protection Layer Application :2026-08-09, 1d
+
+                        section Feature Elements
+                        Media Wall Joinery Install :2026-08-10, 7d
+                        Feature Chandelier Mounting :2026-08-17, 3d
+                        Smart Curtain Motor Install :2026-08-20, 3d
+
+                        section Final Touches
+                        Wall Paint & Texture :2026-08-14, 7d
+                        Skirting & Coving Install :2026-08-21, 3d
+                        Final Electrical Termination :2026-08-24, 2d
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: KITCHEN -->
+        <div id="kitchen" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🍳 Designer Kitchen Installation</span>
+                    <span class="card-badge">6 Weeks</span>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        title Kitchen Workflow
+                        dateFormat YYYY-MM-DD
+                        axisFormat Week %U
+
+                        section Services Rough-in
+                        Plumbing (Hot/Cold/Waste) :2026-08-26, 7d
+                        Electrical (Appliance Circuits) :2026-08-31, 7d
+                        Gas Line (If Applicable) :2026-09-05, 4d
+
+                        section Carcass Installation
+                        Base Unit Leveling :2026-09-09, 4d
+                        Wall Unit Fixing :2026-09-13, 3d
+                        Island Plumb/Electrical Feed :2026-09-16, 3d
+
+                        section Countertops
+                        Stone Templating :2026-09-19, 1d
+                        Book-Matched Cutting :2026-09-20, 3d
+                        Installation & Sealing :2026-09-23, 2d
+
+                        section Appliances
+                        Oven/Microwave Flush Mount :2026-09-25, 2d
+                        Cooktop Cutout & Install :2026-09-27, 2d
+                        Hood Ducting & Install :2026-09-29, 2d
+
+                        section Finishing
+                        Under-Cabinet LED Routering :2026-10-01, 2d
+                        Splashback Install :2026-10-03, 2d
+                        Handles & Hardware :2026-10-05, 2d
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: MEP -->
+        <div id="mep" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">⚡ MEP Infrastructure Timeline</span>
+                    <span class="card-badge">Critical Path</span>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        dateFormat YYYY-MM-DD
+                        axisFormat %b
+
+                        section HVAC Systems
+                        VRF Outdoor Unit Rigging (Roof) :active, 2026-01-15, 2026-02-28
+                        Copper Riser Connections :2026-02-01, 2026-04-15
+                        Ducting Insulation :2026-03-01, 2026-05-15
+                        Gas Charging & Vacuum Test :crit, 2026-08-01, 2026-09-15
+                        Air Balancing (CFM) :2026-10-01, 2026-11-15
+
+                        section Electrical Infrastructure
+                        Main Panel Dressing :2026-03-01, 2026-05-01
+                        Sub-Panel Termination :2026-04-01, 2026-06-15
+                        Generator ATS Syncing :crit, 2026-06-01, 2026-07-15
+                        Load Bank Testing :crit, 2026-07-15, 2026-08-01
+
+                        section Plumbing
+                        Vertical Stack Termination :2026-02-01, 2026-03-30
+                        Pressure Test (Building-Wide) :crit, 2026-04-01, 2026-04-15
+                        Hot Water Circulator Install :2026-05-01, 2026-06-01
+
+                        section Fire & Life Safety
+                        Sprinkler Head Install :2026-04-01, 2026-07-15
+                        Fire Alarm Loop Testing :crit, 2026-09-01, 2026-10-31
+                        Emergency Lighting Commissioning :2026-10-15, 2026-11-30
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 7: AMENITIES -->
+        <div id="amenities" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🏊 Amenities Floor (Level 7)</span>
+                    <span class="card-badge">5 Months</span>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="mermaid">
+                        gantt
+                        dateFormat YYYY-MM-DD
+                        axisFormat %b
+
+                        section Swimming Pool
+                        Shell Waterproofing (3 Coats) :2026-03-01, 2026-04-15
+                        Mosaic Tiling :2026-04-15, 2026-05-30
+                        Pump Room Equipment :2026-05-01, 2026-06-30
+                        Water Filling & Chemical Balance :2026-07-01, 2026-07-15
+
+                        section Gym
+                        Acoustic Underlay :2026-06-01, 2026-06-15
+                        Rubberized Flooring :2026-06-15, 2026-07-15
+                        Equipment Delivery & Install :2026-08-01, 2026-09-01
+
+                        section Spa & Sauna
+                        Vapor Barrier Install :2026-06-15, 2026-07-01
+                        Cedar Cladding :2026-07-01, 2026-07-30
+                        Heater Commissioning :2026-08-01, 2026-08-15
+
+                        section Lounge & Reception
+                        Joinery (Reception Desk) :2026-07-01, 2026-08-15
+                        Feature Chandelier Install :2026-08-15, 2026-09-01
+                        Furniture & Soft Furnishing :2026-09-15, 2026-10-15
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            // Show selected view
+            document.getElementById(tabId).classList.add('active-view');
+            // Add active class to clicked nav item
+            event.currentTarget.classList.add('active');
+
+            // Re-add hover effects for new charts
+            setTimeout(() => {
+                addHoverEffects();
+            }, 500);
+        }
+
+        // Add interactive hover effects to chart elements
+        function addHoverEffects() {
+            const infoBox = document.getElementById('timelineInfo');
+            const chartElements = document.querySelectorAll('.mermaid rect, .mermaid text');
+
+            chartElements.forEach(el => {
+                el.addEventListener('mouseenter', function (e) {
+                    const taskName = this.textContent || 'Task';
+                    infoBox.innerHTML = `
+                    <h4>📋 ${taskName}</h4>
+                    <p><strong>Status:</strong> Scheduled</p>
+                    <p><strong>Duration:</strong> Variable</p>
+                    <p><em>Hover over specific tasks for detailed timelines</em></p>
+                `;
+                    infoBox.classList.add('visible');
+                });
+
+                el.addEventListener('mouseleave', function () {
+                    setTimeout(() => {
+                        if (!infoBox.matches(':hover')) {
+                            infoBox.classList.remove('visible');
+                        }
+                    }, 200);
+                });
+            });
+
+            // Keep info box visible when hovering over it
+            infoBox.addEventListener('mouseenter', function () {
+                this.classList.add('visible');
+            });
+
+            infoBox.addEventListener('mouseleave', function () {
+                this.classList.remove('visible');
+            });
+        }
+
+        // Initialize hover effects after page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addHoverEffects();
+            }, 1500);
+        });
+
+        // Make checkboxes interactive
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('checkbox')) {
+                e.target.style.background = e.target.style.background ? '' : 'var(--accent)';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

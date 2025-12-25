@@ -1,0 +1,2791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOTA Tower - Executive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0e1a;
+            --panel-bg: #1e293b;
+            --sidebar-bg: #020617;
+            --accent: #38bdf8;
+            --accent-purple: #818cf8;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            padding-left: 15px;
+            border-left: 5px solid var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-mini {
+            background: rgba(56, 189, 248, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .stats-mini h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding-left: 15px;
+        }
+
+        .nav-item {
+            padding: 14px 18px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--text-main);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(56, 189, 248, 0.05) 100%);
+            color: var(--accent);
+            border-left: 3px solid var(--accent);
+        }
+
+        .main {
+            flex-grow: 1;
+            padding: 40px 50px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+
+        h1 span {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #0ea5e9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active-view {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Gantt Chart */
+        .gantt-chart {
+            overflow-x: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .gantt-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-left: 280px;
+            font-weight: 600;
+        }
+
+        .gantt-week {
+            min-width: 100px;
+            text-align: center;
+            padding: 5px;
+            background: rgba(56, 189, 248, 0.05);
+            border-radius: 5px;
+        }
+
+        .gantt-section {
+            margin-bottom: 25px;
+            border-left: 3px solid var(--accent);
+            padding-left: 15px;
+        }
+
+        .gantt-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .gantt-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            position: relative;
+        }
+
+        .gantt-row:hover {
+            background: rgba(56, 189, 248, 0.05);
+            border-radius: 8px;
+        }
+
+        .gantt-label {
+            width: 260px;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .icon-critical {
+            background: var(--danger);
+        }
+
+        .icon-inspection {
+            background: var(--warning);
+        }
+
+        .icon-standard {
+            background: var(--accent);
+        }
+
+        .icon-delivery {
+            background: var(--accent-purple);
+        }
+
+        .gantt-timeline {
+            flex-grow: 1;
+            display: flex;
+            gap: 2px;
+            position: relative;
+            height: 35px;
+        }
+
+        .gantt-block {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .gantt-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+            z-index: 10;
+        }
+
+        .gantt-block.phase1 {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        }
+
+        .gantt-block.phase2 {
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+        }
+
+        .gantt-block.phase3 {
+            background: linear-gradient(135deg, #34d399, #10b981);
+        }
+
+        .gantt-block.phase4 {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .gantt-block.critical {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse-critical 2s infinite;
+        }
+
+        @keyframes pulse-critical {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .gantt-block.inspection {
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            border: 2px dashed #fff;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: var(--panel-bg);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 12px 15px;
+            min-width: 250px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .gantt-block:hover .tooltip {
+            opacity: 1;
+        }
+
+        .tooltip h4 {
+            color: var(--accent);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .tooltip p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 4px 0;
+        }
+
+        .tooltip .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--warning);
+        }
+
+        .status-progress {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--accent);
+        }
+
+        .status-complete {
+            background: rgba(52, 211, 153, 0.2);
+            color: var(--success);
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 30px 0 15px 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .phase-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .phase-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .phase-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-muted);
+        }
+
+        /* Expandable sections */
+        .expandable {
+            margin-top: 15px;
+        }
+
+        .expand-toggle {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .expand-toggle:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .expand-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .expand-content.open {
+            max-height: 2000px;
+        }
+
+        .checklist {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .checklist-section {
+            margin-bottom: 20px;
+        }
+
+        .checklist-section h4 {
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .check-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 3px solid var(--border);
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .check-item:hover {
+            border-left-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+            transform: translateX(5px);
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .checkbox:hover {
+            background: rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .checkbox.checked {
+            background: var(--accent);
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+            transition: width 0.3s ease;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">RHODIUM</div>
+
+        <div class="stats-mini">
+            <h4>Project Overview</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">371</div>
+                    <div class="stat-label">Days Left</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">78%</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">142</div>
+                    <div class="stat-label">Tasks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Project Overview</div>
+            <div class="nav-item active" onclick="switchTab('master')">Master Schedule</div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Unit Breakdown</div>
+            <div class="nav-item" onclick="switchTab('bathroom')">🚿 Luxury Bathroom</div>
+            <div class="nav-item" onclick="switchTab('bedroom')">🛏️ Master Bedroom</div>
+            <div class="nav-item" onclick="switchTab('living')">🛋️ Living & Dining</div>
+            <div class="nav-item" onclick="switchTab('kitchen')">🍳 Designer Kitchen</div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Infrastructure</div>
+            <div class="nav-item" onclick="switchTab('mep')">⚡ MEP Systems</div>
+            <div class="nav-item" onclick="switchTab('amenities')">🏊 Amenities (L7)</div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <header>
+            <h1>Project <span>Recovery Plan</span></h1>
+        </header>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="exportReport()">📊 Export Report</button>
+            <button class="btn btn-secondary" onclick="toggleFilters()">🔍 Filters</button>
+            <button class="btn btn-secondary" onclick="calculateProgress()">📈 Update Progress</button>
+        </div>
+
+        <!-- MASTER SCHEDULE -->
+        <div id="master" class="view-section active-view">
+            <div class="card">
+                <div class="card-title">
+                    <span>Project Phasing Overview (Jan - Dec 2026)</span>
+                    <div class="progress-bar" style="width: 200px;">
+                        <div class="progress-fill" style="width: 42%;"></div>
+                    </div>
+                </div>
+
+                <div class="filter-controls">
+                    <div class="filter-btn active">All Tasks</div>
+                    <div class="filter-btn">Critical Path</div>
+                    <div class="filter-btn">Inspections Only</div>
+                    <div class="filter-btn">Behind Schedule</div>
+                </div>
+
+                <div class="gantt-chart">
+                    <div class="gantt-header">
+                        <div class="gantt-week">Jan</div>
+                        <div class="gantt-week">Feb</div>
+                        <div class="gantt-week">Mar</div>
+                        <div class="gantt-week">Apr</div>
+                        <div class="gantt-week">May</div>
+                        <div class="gantt-week">Jun</div>
+                        <div class="gantt-week">Jul</div>
+                        <div class="gantt-week">Aug</div>
+                        <div class="gantt-week">Sep</div>
+                        <div class="gantt-week">Oct</div>
+                        <div class="gantt-week">Nov</div>
+                        <div class="gantt-week">Dec</div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🏗️ Foundation & Core Systems</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Lifts Mechanical Complete
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 25%;">
+                                    Jan 1 → Mar 15
+                                    <div class="tooltip">
+                                        <h4>Lifts Installation</h4>
+                                        <p>Duration: 75 days</p>
+                                        <p>Team: Otis/Schindler</p>
+                                        <p>Dependencies: Power supply, shaft completion</p>
+                                        <span class="status status-progress">In Progress</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                MEP Basement Termination
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 17%; margin-left: 8%;">
+                                    Feb 1 → Feb 28
+                                    <div class="tooltip">
+                                        <h4>Basement MEP</h4>
+                                        <p>Duration: 28 days</p>
+                                        <p>Team: MEP Contractor</p>
+                                        <p>Main panels, risers, terminations</p>
+                                        <span class="status status-progress">In Progress</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🏢 Vertical Phasing (Floors 8-22)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Floors 8-12 MEP + Finishes
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 58%; margin-left: 8%;">
+                                    Feb → Aug (Critical)
+                                    <div class="tooltip">
+                                        <h4>Lower Floors Package</h4>
+                                        <p>Duration: 210 days</p>
+                                        <p>Units: 20 apartments</p>
+                                        <p>Status: Critical path item</p>
+                                        <span class="status status-pending">Pending Start</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Floors 13-17 MEP + Finishes
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 58%; margin-left: 17%;">
+                                    Mar → Sep (Critical)
+                                    <div class="tooltip">
+                                        <h4>Mid Floors Package</h4>
+                                        <p>Duration: 210 days</p>
+                                        <p>Units: 20 apartments</p>
+                                        <p>Cascading from lower floors</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Floors 18-22 MEP + Finishes
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 58%; margin-left: 25%;">
+                                    Apr → Oct (Critical)
+                                    <div class="tooltip">
+                                        <h4>Upper Floors Package</h4>
+                                        <p>Duration: 210 days</p>
+                                        <p>Units: 20 apartments</p>
+                                        <p>Highest standard finishes</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">★</div>
+                                Penthouses (VIP Treatment)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 67%; margin-left: 25%;">
+                                    Apr → Nov
+                                    <div class="tooltip">
+                                        <h4>Penthouse Units</h4>
+                                        <p>Duration: 240 days</p>
+                                        <p>Units: 4 penthouses</p>
+                                        <p>Bespoke finishes, custom joinery</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">✅ Testing & Commissioning</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-inspection">✓</div>
+                                Testing & Commissioning
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase3 inspection" style="width: 17%; margin-left: 75%;">
+                                    Oct → Nov
+                                    <div class="tooltip">
+                                        <h4>T&C Phase</h4>
+                                        <p>All systems operational testing</p>
+                                        <p>HVAC balancing, electrical load tests</p>
+                                        <p>Fire alarm integration testing</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-inspection">✓</div>
+                                Civil Defense Inspection
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block inspection" style="width: 8.3%; margin-left: 87.5%;">
+                                    Nov 15
+                                    <div class="tooltip">
+                                        <h4>CD Approval</h4>
+                                        <p>Critical milestone</p>
+                                        <p>Cannot handover without this</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Snagging & Handover Prep
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase4" style="width: 13%; margin-left: 87%;">
+                                    Dec
+                                    <div class="tooltip">
+                                        <h4>Final Snagging</h4>
+                                        <p>Punch list completion</p>
+                                        <p>White glove cleaning</p>
+                                        <p>Final walkthroughs</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BATHROOM: ULTRA-DETAILED PROJECT MANAGER VIEW -->
+        <div id="bathroom" class="view-section">
+            <div class="card">
+                <div class="card-title">
+                    <span>🚿 Luxury Bathroom - Ultra-Granular Timeline</span>
+                    <div class="progress-bar" style="width: 200px;">
+                        <div class="progress-fill" style="width: 28%;"></div>
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>WEEK 1-3: Waterproofing & MEP Infrastructure</h3>
+                    <p>Foundation systems - Critical for leak-free operation</p>
+                    <div class="phase-meta">
+                        <div class="meta-item">⏱️ Duration: 21 days</div>
+                        <div class="meta-item">👥 Team: 6 specialists</div>
+                        <div class="meta-item">💰 Phase Budget: $85k</div>
+                    </div>
+                </div>
+
+                <div class="gantt-chart">
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🛡️ Tanking System (Days 1-7)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Surface Preparation & Cleaning
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%;">
+                                    Day 1
+                                    <div class="tooltip">
+                                        <h4>Surface Prep</h4>
+                                        <p>Concrete grinding, crack repair</p>
+                                        <p>Team: 2 prep specialists</p>
+                                        <p>Inspector: Site Engineer</p>
+                                        <span class="status status-progress">In Progress</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-delivery">📦</div>
+                                Material Delivery: Ardex Tanking Kit
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 5%;">
+                                    Day 1
+                                    <div class="tooltip">
+                                        <h4>Material Delivery</h4>
+                                        <p>Ardex WPM300 (15 bags)</p>
+                                        <p>Supplier: ABC Building Supplies</p>
+                                        <p>Needs: Storage area, QC check</p>
+                                        <span class="status status-pending">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Primer Application (1st Coat)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 10%;">
+                                    Day 2
+                                    <div class="tooltip">
+                                        <h4>Primer Coat</h4>
+                                        <p>Bond coat for membrane adherence</p>
+                                        <p>Coverage: 80m²</p>
+                                        <p>Drying time: 4 hours</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Liquid Membrane 1st Coat (Floor + 300mm Wall)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 10%; margin-left: 15%;">
+                                    Day 3-4
+                                    <div class="tooltip">
+                                        <h4>First Membrane Layer</h4>
+                                        <p>Full floor + 300mm up walls</p>
+                                        <p>Application: Brush & roller</p>
+                                        <p>Thickness: 1.5mm wet</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Corner Reinforcement Tape/Mesh
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 5%; margin-left: 25%;">
+                                    Day 5
+                                    <div class="tooltip">
+                                        <h4>Critical Junction Sealing</h4>
+                                        <p>All floor-wall & wall-wall junctions</p>
+                                        <p>Material: Butyl tape + fibreglass mesh</p>
+                                        <p>QC: Zero air bubbles</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Shower Zone Extension (Full Height 2.1m)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 10%; margin-left: 30%;">
+                                    Day 6-7
+                                    <div class="tooltip">
+                                        <h4>Shower Tanking</h4>
+                                        <p>Full height waterproofing</p>
+                                        <p>Area: 12m² vertical</p>
+                                        <p>Extra coat on niches</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Second Membrane Coat (Complete Coverage)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 10%; margin-left: 40%;">
+                                    Day 8-9
+                                    <div class="tooltip">
+                                        <h4>Second Coat</h4>
+                                        <p>Complete system coverage</p>
+                                        <p>Perpendicular application to first coat</p>
+                                        <p>Total thickness: 3mm minimum</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-inspection">✓</div>
+                                24hr Curing & Pre-Test Inspection
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block inspection" style="width: 5%; margin-left: 50%;">
+                                    Day 10
+                                    <div class="tooltip">
+                                        <h4>Cure & Inspect</h4>
+                                        <p>Visual inspection for pinholes</p>
+                                        <p>Thickness verification (probe)</p>
+                                        <p>Inspector: MEP Engineer</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">💧 Flood Testing (Days 11-14)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Drain Plugging & Sealing
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 55%;">
+                                    Day 11
+                                    <div class="tooltip">
+                                        <h4>Test Preparation</h4>
+                                        <p>Install temporary drain plugs</p>
+                                        <p>All penetrations sealed</p>
+                                        <p>Photography: Before shots</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Water Filling (50mm depth)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 60%;">
+                                    Day 11
+                                    <div class="tooltip">
+                                        <h4>Flood Test Start</h4>
+                                        <p>Water depth: 50mm across floor</p>
+                                        <p>Volume: ~400L</p>
+                                        <p>Mark water level on walls</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                48hr Observation Period
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 15%; margin-left: 65%;">
+                                    Day 12-13 (CRITICAL)
+                                    <div class="tooltip">
+                                        <h4>Critical Test Period</h4>
+                                        <p>No water level drop allowed (>2mm fails)</p>
+                                        <p>Check ceiling below every 6hrs</p>
+                                        <p>Photography: Progression shots</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-inspection">✓</div>
+                                Drain Down & Final Inspection
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block inspection" style="width: 5%; margin-left: 80%;">
+                                    Day 14
+                                    <div class="tooltip">
+                                        <h4>Test Completion</h4>
+                                        <p>Drain water, check ceiling below</p>
+                                        <p>Sign-off: Consultant + Main Contractor</p>
+                                        <p>Certificate issued before proceeding</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🔧 Plumbing & Drainage (Days 15-21)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-delivery">📦</div>
+                                Pipe Delivery (Rehau/Geberit)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 85%;">
+                                    Day 15
+                                    <div class="tooltip">
+                                        <h4>Piping Materials</h4>
+                                        <p>Hot: Rehau PEX-AL-PEX 16mm</p>
+                                        <p>Cold: Rehau PEX-AL-PEX 16mm</p>
+                                        <p>Waste: Geberit Silent-db20 (40/50mm)</p>
+                                        <span class="status status-pending">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Hot/Cold Pressure Test (10 Bar, 24hrs)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 8%; margin-left: 90%;">
+                                    Day 16-17
+                                    <div class="tooltip">
+                                        <h4>Pressure Testing</h4>
+                                        <p>Test pressure: 10 Bar (cold), 8 Bar (hot)</p>
+                                        <p>Duration: 24 hours minimum</p>
+                                        <p>Max drop: 0.1 Bar (PASS), 0.2+ Bar (FAIL)</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expandable Quality Checklist -->
+                <div class="expandable">
+                    <div class="expand-toggle" onclick="toggleExpand(this)">
+                        <span><strong>📋 Quality Assurance Checklist (32 Items)</strong></span>
+                        <span>▼</span>
+                    </div>
+                    <div class="expand-content">
+                        <div class="checklist">
+                            <div class="checklist-section">
+                                <h4>🛡️ Waterproofing Standards</h4>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Substrate completely clean, dry, and dust-free before application
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    All cracks >0.5mm repaired with epoxy filler
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Primer coverage verified (no bare patches)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    First membrane coat perpendicular to second coat application
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Minimum thickness 3mm verified with wet film gauge
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Corner reinforcement tape fully embedded (zero air voids)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Shower zone: Full height coverage to 2.1m minimum
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    All penetrations (pipes/fixtures) sealed with expanding collar
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Visual inspection: Zero pinholes or thin spots detected
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    48hr flood test PASSED (water level drop &lt;2mm)
+                                </div>
+                            </div>
+
+                            <div class="checklist-section">
+                                <h4>🔧 Plumbing & Drainage QC</h4>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    All pipes clipped at max 600mm centers (manufacturer spec)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Hot water pipes insulated with 9mm minimum Class O foam
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Acoustic wrap on ALL waste pipes (Geberit Silent-db20 spec)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Waste pipe slope verified: 1:100 minimum (1cm per meter)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Linear drain installed level (±1mm tolerance across length)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Hot/Cold pressure test: 10 Bar for 24hrs (max 0.1 Bar drop)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Waste system air test: 38mm water column for 3 minutes
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    TMV (Thermostatic Mixing Valve) installed on hot supply
+                                </div>
+                            </div>
+
+                            <div class="checklist-section">
+                                <h4>⚡ Electrical & Comfort Tech</h4>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    IP65 rated lights in shower zone (wet zone compliance)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    All electrical cables in conduit/trunking (no exposed runs)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Underfloor heating mat thermistor placement verified
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Mirror defogger pad bonded to glass (tested before fixing)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Extractor fan CFM verified: 15 air changes/hour minimum
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    CRI >90 bulbs specified for all vanity/mirror lighting
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BEDROOM: ULTRA-DETAILED -->
+        <div id="bedroom" class="view-section">
+            <div class="card">
+                <div class="card-title">
+                    <span>🛏️ Master Bedroom - Complete Workflow</span>
+                    <div class="progress-bar" style="width: 200px;">
+                        <div class="progress-fill" style="width: 18%;"></div>
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>WEEK 1-3: MEP Infrastructure & Wall Preparation</h3>
+                    <p>Electrical backbone, data cabling, HVAC rough-in</p>
+                    <div class="phase-meta">
+                        <div class="meta-item">⏱️ Duration: 21 days</div>
+                        <div class="meta-item">👥 Team: 8 specialists</div>
+                        <div class="meta-item">💰 Phase Budget: $45k</div>
+                    </div>
+                </div>
+
+                <div class="gantt-chart">
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">⚡ Electrical Infrastructure (Days 1-10)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Wall Chasing for Outlets (45 points)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 15%;">
+                                    Day 1-3
+                                    <div class="tooltip">
+                                        <h4>Wall Chasing</h4>
+                                        <p>45 power points, 12 switches, 8 data points</p>
+                                        <p>Team: 3 electricians</p>
+                                        <p>Equipment: Wall chaser, dust extraction</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-delivery">📦</div>
+                                Cable Delivery (CAT6A + Power)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 10%;">
+                                    Day 2
+                                    <div class="tooltip">
+                                        <h4>Cabling Materials</h4>
+                                        <p>CAT6A: 500m (smart home ready)</p>
+                                        <p>Power: 2.5mm² twin+earth (300m)</p>
+                                        <p>Conduit: 20mm PVC (100m)</p>
+                                        <span class="status status-pending">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Backbox Installation & Leveling
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 10%; margin-left: 15%;">
+                                    Day 4-5
+                                    <div class="tooltip">
+                                        <h4>Backbox Fixing</h4>
+                                        <p>All boxes level within ±1mm</p>
+                                        <p>Depth check: 35mm standard boxes</p>
+                                        <p>Fire-rated boxes in escape routes</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Smart Home Data Cabling
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 15%; margin-left: 20%;">
+                                    Day 5-7
+                                    <div class="tooltip">
+                                        <h4>AV & Data Infrastructure</h4>
+                                        <p>Centralized rack in service cupboard</p>
+                                        <p>8x CAT6A runs to bedroom</p>
+                                        <p>HDMI conduit behind TV wall</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Reading Light Rough-in (Bedhead)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 10%; margin-left: 30%;">
+                                    Day 7-8
+                                    <div class="tooltip">
+                                        <h4>Task Lighting</h4>
+                                        <p>Adjustable LED reading lights (2x)</p>
+                                        <p>3000K warm white, dimmable</p>
+                                        <p>USB charging ports integrated</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">❄️ HVAC Ducting (Days 8-14)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-delivery">📦</div>
+                                Flexible Duct Delivery (Kingspan)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 35%;">
+                                    Day 8
+                                    <div class="tooltip">
+                                        <h4>HVAC Ducting</h4>
+                                        <p>Kingspan KoolDuct 200mm diameter</p>
+                                        <p>Acoustic lined (Class A sound absorption)</p>
+                                        <p>R1.5 insulation value</p>
+                                        <span class="status status-pending">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Duct Routing & Hanging
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 20%; margin-left: 40%;">
+                                    Day 9-12
+                                    <div class="tooltip">
+                                        <h4>Duct Installation</h4>
+                                        <p>Suspended from slab on adjustable hangers</p>
+                                        <p>Max spacing: 1.5m between hangers</p>
+                                        <p>Acoustic dampers at FCU connection</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-critical">!</div>
+                                Alignment with Ceiling Grid
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 5%; margin-left: 60%;">
+                                    Day 13
+                                    <div class="tooltip">
+                                        <h4>Critical Coordination</h4>
+                                        <p>Ensure diffusers align with ceiling tiles</p>
+                                        <p>Verify no clashes with lighting positions</p>
+                                        <p>Final approval before gypsum boarding</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🎨 Plastering & Ceiling (Days 14-28)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Skim Coat Application (2 coats)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase4" style="width: 20%; margin-left: 65%;">
+                                    Day 14-18
+                                    <div class="tooltip">
+                                        <h4>Wall Finishing</h4>
+                                        <p>First coat: Bonding plaster</p>
+                                        <p>Second coat: Multi-finish (smooth)</p>
+                                        <p>Tolerance: ±2mm over 2m straight edge</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                False Ceiling Grid Installation
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 20%; margin-left: 70%;">
+                                    Day 17-21
+                                    <div class="tooltip">
+                                        <h4>Suspended Ceiling</h4>
+                                        <p>Grid system: Armstrong 24mm</p>
+                                        <p>Height: 2.7m (conceal services)</p>
+                                        <p>Access panels: 4x positions for MEP</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phase-header">
+                    <h3>WEEK 4-6: Flooring & Fitted Joinery</h3>
+                    <p>Premium wood flooring, custom wardrobes with soft-close</p>
+                    <div class="phase-meta">
+                        <div class="meta-item">⏱️ Duration: 21 days</div>
+                        <div class="meta-item">👥 Team: 5 joiners</div>
+                        <div class="meta-item">💰 Phase Budget: $65k</div>
+                    </div>
+                </div>
+
+                <div class="gantt-chart">
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🪵 Premium Flooring (Days 29-42)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Screed Leveling & Drying
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase3" style="width: 15%;">
+                                    Day 29-32
+                                    <div class="tooltip">
+                                        <h4>Floor Preparation</h4>
+                                        <p>Laser leveling to ±2mm tolerance</p>
+                                        <p>Rapid dry screed (48hr cure)</p>
+                                        <p>Area: 32m²</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-inspection">✓</div>
+                                Moisture Test (Critical)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block critical" style="width: 10%; margin-left: 15%;">
+                                    Day 33-35
+                                    <div class="tooltip">
+                                        <h4>Moisture Check</h4>
+                                        <p>Required: &lt;75% RH for wood installation</p>
+                                        <p>Test method: Tramex meter (3 points)</p>
+                                        <p>Re-test if >75% (delay install)</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-delivery">📦</div>
+                                Engineered Oak Delivery
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase3" style="width: 5%; margin-left: 30%;">
+                                    Day 36
+                                    <div class="tooltip">
+                                        <h4>Premium Flooring</h4>
+                                        <p>European Oak 21mm engineered</p>
+                                        <p>UV Oil finish (Matt)</p>
+                                        <p>36m² + 10% wastage</p>
+                                        <span class="status status-pending">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Wood Installation (Floating)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase3" style="width: 20%; margin-left: 35%;">
+                                    Day 37-40
+                                    <div class="tooltip">
+                                        <h4>Installation Method</h4>
+                                        <p>Floating on 3mm acoustic underlay</p>
+                                        <p>10mm expansion gap all sides</p>
+                                        <p>Random plank layout (avoid H-joints)</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-section">
+                        <div class="gantt-section-title">🚪 Custom Wardrobe (Days 42-56)</div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-delivery">📦</div>
+                                Carcass Delivery (Pre-fabricated)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 5%; margin-left: 55%;">
+                                    Day 42
+                                    <div class="tooltip">
+                                        <h4>Joinery Components</h4>
+                                        <p>3.6m wide × 2.4m high wardrobe</p>
+                                        <p>18mm melamine carcass</p>
+                                        <p>Lacquered MDF doors (Matt finish)</p>
+                                        <span class="status status-pending">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Carcass Assembly & Leveling
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 15%; margin-left: 60%;">
+                                    Day 43-46
+                                    <div class="tooltip">
+                                        <h4>Carcass Installation</h4>
+                                        <p>Level to ±1mm (laser checked)</p>
+                                        <p>Scribe to walls (±2mm gap max)</p>
+                                        <p>Fixed to wall with heavy-duty brackets</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Soft-Close Drawer Mechanisms
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 10%; margin-left: 75%;">
+                                    Day 47-49
+                                    <div class="tooltip">
+                                        <h4>Drawer Systems</h4>
+                                        <p>Blum Tandembox runners (full extension)</p>
+                                        <p>12x drawers with soft-close dampers</p>
+                                        <p>80kg load capacity per drawer</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                Door Hanging & Alignment
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase2" style="width: 15%; margin-left: 80%;">
+                                    Day 50-53
+                                    <div class="tooltip">
+                                        <h4>Door Installation</h4>
+                                        <p>6x doors on concealed hinges</p>
+                                        <p>
+                                            &lt;3mm gap uniformity</p>
+                                        <p>Soft-close dampers on all hinges</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">
+                                <div class="task-icon icon-standard">●</div>
+                                LED Strip Installation (Interior)
+                            </div>
+                            <div class="gantt-timeline">
+                                <div class="gantt-block phase1" style="width: 5%; margin-left: 92%;">
+                                    Day 54-55
+                                    <div class="tooltip">
+                                        <h4>Internal Lighting</h4>
+                                        <p>Warm white LED strips (2700K)</p>
+                                        <p>Motion sensor activation</p>
+                                        <p>Aluminum profile with diffuser</p>
+                                        <span class="status status-pending">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expandable Quality Checklist -->
+                <div class="expandable">
+                    <div class="expand-toggle" onclick="toggleExpand(this)">
+                        <span><strong>📋 Quality Checklist - Bedroom (28 Items)</strong></span>
+                        <span>▼</span>
+                    </div>
+                    <div class="expand-content">
+                        <div class="checklist">
+                            <div class="checklist-section">
+                                <h4>⚡ Electrical Standards</h4>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    All socket heights uniform at 450mm (±5mm tolerance)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Switch plates level (verified with spirit level)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    CAT6A termination tested (gigabit speeds verified)
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Reading lights dimmable and independently controlled
+                                </div>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    USB charging points functional (5V 2.4A minimum)
+                                </div>
+                            </div>
+
+                            <div class="checklist-section">
+                                <h4>🪵 Flooring QC</h4>
+                                <div class="check-item">
+                                    <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                    Moisture test PASSED (&lt;75% RH across all test points)
+                                    <div class="check-item">
+                                        <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                        No H-joints (staggered pattern >30cm offset)
+                                    </div>
+                                    <div class="check-item">
+                                        <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                        10mm expansion gap maintained (hidden by skirting)
+                                    </div>
+                                    <div class="check-item">
+                                        <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                        Squeaks addressed (re-fix any loose boards)
+                                    </div>
+                                    <div class="check-item">
+                                        <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                        Final oiling/waxing complete (protection layer)
+                                    </div>
+                                </div>
+
+                                <div class="checklist-section">
+                                    <h4>🚪 Wardrobe Quality</h4>
+                                    <div class="check-item">
+                                        <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                        Carcass level verified (±1mm across all planes)
+                                    </div>
+                                    <div class="check-item">
+                                        <div class="checkbox" onclick="this.classList.toggle('checked')"></div>
+                                        Door gaps uniform (&lt;3mm variation)
+                                        <div class="check-item">
+                                            <div class="checkbox" onclick="this.classList.toggle('checked')">
+                                            </div>
+                                            All soft-close mechanisms functional (tested 100x)
+                                        </div>
+                                        <div class="check-item">
+                                            <div class="checkbox" onclick="this.classList.toggle('checked')">
+                                            </div>
+                                            Drawer extension smooth (no binding at any point)
+                                        </div>
+                                        <div class="check-item">
+                                            <div class="checkbox" onclick="this.classList.toggle('checked')">
+                                            </div>
+                                            LED strips motion-activated and uniform brightness
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIVING & DINING: ULTRA-DETAILED -->
+                <div id="living" class="view-section">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>🛋️ Living & Dining - Complete AV & Finishing</span>
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 22%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="phase-header">
+                            <h3>WEEK 1-4: Media Wall & AV Infrastructure</h3>
+                            <p>Hidden cabling, speaker integration, entertainment backbone</p>
+                            <div class="phase-meta">
+                                <div class="meta-item">⏱️ Duration: 28 days</div>
+                                <div class="meta-item">👥 Team: 6 specialists</div>
+                                <div class="meta-item">💰 Phase Budget: $95k</div>
+                            </div>
+                        </div>
+
+                        <div class="gantt-chart">
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">📺 Media Wall Structure (Days 1-14)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Stud Frame for Media Wall
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 15%;">
+                                            Day 1-3
+                                            <div class="tooltip">
+                                                <h4>Media Wall Frame</h4>
+                                                <p>Metal stud frame 4m wide × 2.7m high</p>
+                                                <p>Heavy duty for 75" TV + soundbar</p>
+                                                <p>Load capacity: 100kg minimum</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        HDMI/CAT6 Conduit Embedding
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 20%; margin-left: 10%;">
+                                            Day 2-6
+                                            <div class="tooltip">
+                                                <h4>Hidden Cabling</h4>
+                                                <p>4× HDMI 2.1 conduits (8K ready)</p>
+                                                <p>6× CAT6A for network devices</p>
+                                                <p>Power: 4× double sockets behind TV</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Invisible Speaker Delivery (KEF)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 5%; margin-left: 25%;">
+                                            Day 6
+                                            <div class="tooltip">
+                                                <h4>In-Wall Speakers</h4>
+                                                <p>KEF Ci200RR-THX (4× units)</p>
+                                                <p>Front L/R + Surround L/R</p>
+                                                <p>Frequency: 38Hz-28kHz</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Speaker Rough-in & Wiring
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 15%; margin-left: 30%;">
+                                            Day 7-10
+                                            <div class="tooltip">
+                                                <h4>Audio Wiring</h4>
+                                                <p>OFC speaker cable (14 AWG)</p>
+                                                <p>All runs to AV receiver location</p>
+                                                <p>Cable labeling for phase matching</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Gypsum Board Application (3 layers)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 20%; margin-left: 45%;">
+                                            Day 11-14
+                                            <div class="tooltip">
+                                                <h4>Wall Closure</h4>
+                                                <p>Triple layer for acoustics</p>
+                                                <p>Green glue between layers</p>
+                                                <p>Cutouts for TV mount reinforced</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">❄️ HVAC Linear Diffusers (Days 15-21)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Linear Slot Diffuser Delivery
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 5%; margin-left: 65%;">
+                                            Day 15
+                                            <div class="tooltip">
+                                                <h4>HVAC Aesthetics</h4>
+                                                <p>Trox VSD-C linear slot (6m length)</p>
+                                                <p>Powder coat: RAL 9003 white</p>
+                                                <p>Matching ceiling grid alignment</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-critical">!</div>
+                                        Alignment with Lighting Tracks
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block critical" style="width: 5%; margin-left: 70%;">
+                                            Day 16
+                                            <div class="tooltip">
+                                                <h4>Critical Coordination</h4>
+                                                <p>Ensure symmetry with track lights</p>
+                                                <p>Diffuser spacing: 600mm from light track</p>
+                                                <p>Final approval before fixing</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Diffuser Installation & Commissioning
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 15%; margin-left: 75%;">
+                                            Day 17-21
+                                            <div class="tooltip">
+                                                <h4>Final HVAC Install</h4>
+                                                <p>CFM balancing per zone</p>
+                                                <p>Noise level &lt;30dB target</p>
+                                                <p>Airflow direction adjustment</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="phase-header">
+                            <h3>WEEK 4-6: Flooring & Feature Lighting</h3>
+                            <p>Premium marble, track lighting, chandelier installation</p>
+                            <div class="phase-meta">
+                                <div class="meta-item">⏱️ Duration: 14 days</div>
+                                <div class="meta-item">👥 Team: 7 specialists</div>
+                                <div class="meta-item">💰 Phase Budget: $125k</div>
+                            </div>
+                        </div>
+
+                        <div class="gantt-chart">
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">🪨 Premium Flooring (Days 22-35)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Italian Marble Delivery (Book-matched)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 5%;">
+                                            Day 22
+                                            <div class="tooltip">
+                                                <h4>Premium Stone</h4>
+                                                <p>Calacatta Gold 1200×600×20mm</p>
+                                                <p>Book-matched slabs (sequential veining)</p>
+                                                <p>65m² + 10% wastage</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Dry Layout & Pattern Matching
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 10%; margin-left: 5%;">
+                                            Day 23-25
+                                            <div class="tooltip">
+                                                <h4>Pattern Planning</h4>
+                                                <p>Book-match verification</p>
+                                                <p>Vein flow continuity check</p>
+                                                <p>Client approval before fixing</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Marble Installation (Full Bond)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 25%; margin-left: 15%;">
+                                            Day 26-32
+                                            <div class="tooltip">
+                                                <h4>Stone Fixing</h4>
+                                                <p>Full bed adhesive method</p>
+                                                <p>Lippage tolerance: ±0.5mm</p>
+                                                <p>Joint width: 2mm consistent</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-inspection">✓</div>
+                                        Polishing & Sealing
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 15%; margin-left: 40%;">
+                                            Day 33-35
+                                            <div class="tooltip">
+                                                <h4>Final Finish</h4>
+                                                <p>Diamond polishing (3000 grit)</p>
+                                                <p>Penetrating sealer (2 coats)</p>
+                                                <p>Mirror-like gloss finish</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">💡 Feature Lighting (Days 30-42)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Feature Chandelier (Swarovski)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 5%; margin-left: 50%;">
+                                            Day 30
+                                            <div class="tooltip">
+                                                <h4>Statement Piece</h4>
+                                                <p>Swarovski Verve 1.2m diameter</p>
+                                                <p>Weight: 45kg (reinforced fixing req'd)</p>
+                                                <p>LED: 3000K warm white dimmable</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Chandelier Installation & Leveling
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 10%; margin-left: 55%;">
+                                            Day 31-33
+                                            <div class="tooltip">
+                                                <h4>Precision Hanging</h4>
+                                                <p>Reinforced ceiling anchor (M16 bolt)</p>
+                                                <p>Height: 2.4m from floor</p>
+                                                <p>Level verification (±2mm)</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Track Lighting System (Philips Hue)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 20%; margin-left: 65%;">
+                                            Day 35-40
+                                            <div class="tooltip">
+                                                <h4>Accent Lighting</h4>
+                                                <p>Philips Hue 3m track (2× runs)</p>
+                                                <p>6× adjustable spotlights per track</p>
+                                                <p>Smart dimming + color temperature</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KITCHEN: DETAILED -->
+                <div id="kitchen" class="view-section">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>🍳 Designer Kitchen - Italian Import</span>
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 35%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="phase-header">
+                            <h3>WEEK 1-6: Cabinetry & Appliances</h3>
+                            <p>Snaidero Italia kitchen with Gaggenau appliances</p>
+                            <div class="phase-meta">
+                                <div class="meta-item">⏱️ Duration: 42 days</div>
+                                <div class="meta-item">👥 Team: 4 specialists</div>
+                                <div class="meta-item">💰 Phase Budget: $185k</div>
+                            </div>
+                        </div>
+
+                        <div class="gantt-chart">
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">🪵 Cabinet Installation (Days 1-21)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Italian Cabinet Delivery (Snaidero)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 5%;">
+                                            Day 1
+                                            <div class="tooltip">
+                                                <h4>Premium Cabinetry</h4>
+                                                <p>Snaidero Way: Lacquered finish</p>
+                                                <p>12× base + 8× wall units</p>
+                                                <p>Soft-close on all doors/drawers</p>
+                                                <span class="status status-complete">Delivered</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Base Cabinet Installation
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 20%; margin-left: 5%;">
+                                            Day 2-6
+                                            <div class="tooltip">
+                                                <h4>Base Units</h4>
+                                                <p>Laser level alignment (±1mm)</p>
+                                                <p>Height: 900mm to worktop underside</p>
+                                                <p>Legs adjustable 100-180mm</p>
+                                                <span class="status status-progress">In Progress</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Quartz Worktop (Caesarstone)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 5%; margin-left: 20%;">
+                                            Day 5
+                                            <div class="tooltip">
+                                                <h4>Premium Surface</h4>
+                                                <p>Caesarstone 5143 White Attica</p>
+                                                <p>30mm thick, polished edge</p>
+                                                <p>Island + perimeter: 18m linear</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-critical">!</div>
+                                        Worktop Template & Installation
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block critical" style="width: 25%; margin-left: 25%;">
+                                            Day 6-12
+                                            <div class="tooltip">
+                                                <h4>Critical Precision Work</h4>
+                                                <p>Template Day 6, Cut Days 7-9</p>
+                                                <p>Hob cutout: ±1mm tolerance</p>
+                                                <p>Undermount sink prep</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Wall Cabinet Hanging
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 20%; margin-left: 50%;">
+                                            Day 13-17
+                                            <div class="tooltip">
+                                                <h4>Upper Units</h4>
+                                                <p>Height: 2.1m (bottom of unit)</p>
+                                                <p>Heavy duty wall fixings (M10 bolts)</p>
+                                                <p>Load capacity: 25kg per unit</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">🔥 Gaggenau Appliances (Days 18-35)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Appliance Suite Delivery
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 5%; margin-left: 65%;">
+                                            Day 18
+                                            <div class="tooltip">
+                                                <h4>Premium Appliances</h4>
+                                                <p>Induction Hob: CX482</p>
+                                                <p>Oven: BO480/BO481 (double)</p>
+                                                <p>Fridge: RC492/RB492 (integrated)</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Appliance Installation & Testing
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 20%; margin-left: 70%;">
+                                            Day 19-25
+                                            <div class="tooltip">
+                                                <h4>Integration & Commissioning</h4>
+                                                <p>Electrical connection verification</p>
+                                                <p>Hob bridge function test</p>
+                                                <p>Fridge leveling & temp calibration</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-inspection">✓</div>
+                                        Final QC & Client Training
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block inspection" style="width: 10%; margin-left: 85%;">
+                                            Day 26-28
+                                            <div class="tooltip">
+                                                <h4>Handover</h4>
+                                                <p>Full functionality test</p>
+                                                <p>Client training session (2hrs)</p>
+                                                <p>Warranty registration</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MEP SYSTEMS: DETAILED -->
+                <div id="mep" class="view-section">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>⚡ MEP Systems - Building Backbone</span>
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="phase-header">
+                            <h3>Multi-System Integration</h3>
+                            <p>HVAC, Electrical Distribution, Fire Safety</p>
+                            <div class="phase-meta">
+                                <div class="meta-item">⏱️ Duration: 90 days</div>
+                                <div class="meta-item">👥 Team: 15 specialists</div>
+                                <div class="meta-item">💰 Total Budget: $450k</div>
+                            </div>
+                        </div>
+
+                        <div class="gantt-chart">
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">❄️ HVAC - VRF System (Days 1-45)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Daikin VRV-5 Outdoor Units (3×)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 5%;">
+                                            Week 1
+                                            <div class="tooltip">
+                                                <h4>Outdoor Equipment</h4>
+                                                <p>3× Daikin RXYQ16T (16HP each)</p>
+                                                <p>Cooling: 135kW total</p>
+                                                <p>Heating: 150kW total</p>
+                                                <span class="status status-complete">Delivered</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Refrigerant Piping Installation
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 25%; margin-left: 5%;">
+                                            Week 2-5
+                                            <div class="tooltip">
+                                                <h4>Copper Pipework</h4>
+                                                <p>Main runs: 28mm / 16mm</p>
+                                                <p>Total length: ~450m</p>
+                                                <p>Armaflex insulation (19mm)</p>
+                                                <span class="status status-complete">Complete</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        FCU Installation (18× units)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 20%; margin-left: 30%;">
+                                            Week 6-9
+                                            <div class="tooltip">
+                                                <h4>Indoor Units</h4>
+                                                <p>Ceiling cassette: 12 units</p>
+                                                <p>Ducted: 6 units</p>
+                                                <p>Condensate drainage verified</p>
+                                                <span class="status status-progress">Testing</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-critical">!</div>
+                                        Vacuum Test & Gas Charging
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block critical" style="width: 15%; margin-left: 50%;">
+                                            Week 10-12
+                                            <div class="tooltip">
+                                                <h4>Critical Commissioning</h4>
+                                                <p>Vacuum to &lt;500 microns</p>
+                                                <p>Leak test: 24hrs @ 40 Bar</p>
+                                                <p>R410A charge: ~85kg total</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">⚡ Electrical Distribution (Days 1-60)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Main Distribution Board (MDB)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 10%;">
+                                            Week 1-2
+                                            <div class="tooltip">
+                                                <h4>Power Distribution</h4>
+                                                <p>Schneider Prisma P (630A incomer)</p>
+                                                <p>24-way distribution</p>
+                                                <p>MCCB + RCCB protection</p>
+                                                <span class="status status-complete">Installed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Sub-Distribution to Apartments
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase1" style="width: 30%; margin-left: 10%;">
+                                            Week 3-9
+                                            <div class="tooltip">
+                                                <h4>Cable Runs</h4>
+                                                <p>Armored cables: 4-core 95mm²</p>
+                                                <p>6× apartment sub-boards</p>
+                                                <p>Fire-rated cable tray throughout</p>
+                                                <span class="status status-progress">70% Complete</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-inspection">✓</div>
+                                        Megger Testing & Certification
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block inspection" style="width: 10%; margin-left: 75%;">
+                                            Week 12-13
+                                            <div class="tooltip">
+                                                <h4>Compliance Testing</h4>
+                                                <p>Insulation resistance &gt;500MΩ</p>
+                                                <p>Earth continuity &lt;0.5Ω</p>
+                                                <p>EICR certificate issuance</p>
+                                                <span class="status status-pending">Scheduled</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">🔥 Fire Safety Systems (Days 30-75)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Addressable Fire Panel (Apollo)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 5%; margin-left: 40%;">
+                                            Week 6
+                                            <div class="tooltip">
+                                                <h4>Fire Alarm Control</h4>
+                                                <p>Apollo Discovery (2-loop, 250 devices)</p>
+                                                <p>Networked to building BMS</p>
+                                                <p>Voice evacuation integrated</p>
+                                                <span class="status status-pending">Ordered</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Detector & Sounder Installation
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 25%; margin-left: 45%;">
+                                            Week 7-12
+                                            <div class="tooltip">
+                                                <h4>Device Installation</h4>
+                                                <p>85× smoke/heat detectors</p>
+                                                <p>42× manual call points</p>
+                                                <p>28× sounders/beacons</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-critical">!</div>
+                                        Commissioning & Certification
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block critical" style="width: 10%; margin-left: 85%;">
+                                            Week 13-14
+                                            <div class="tooltip">
+                                                <h4>System Acceptance</h4>
+                                                <p>Full zone testing</p>
+                                                <p>Fire brigade liaison</p>
+                                                <p>BS 5839-1 compliance certificate</p>
+                                                <span class="status status-pending">Critical</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AMENITIES: DETAILED -->
+                <div id="amenities" class="view-section">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>🏊 Level 7 Amenities - Luxury Features</span>
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 12%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="phase-header">
+                            <h3>Resident Wellness Floor</h3>
+                            <p>Pool, Gym/Spa, Entertainment Lounge</p>
+                            <div class="phase-meta">
+                                <div class="meta-item">⏱️ Duration: 120 days</div>
+                                <div class="meta-item">👥 Team: 20 specialists</div>
+                                <div class="meta-item">💰 Total Budget: $850k</div>
+                            </div>
+                        </div>
+
+                        <div class="gantt-chart">
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">🏊 Infinity Pool (Days 1-60)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Structural Pool Shell (Concrete)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 20%;">
+                                            Week 1-4
+                                            <div class="tooltip">
+                                                <h4>Pool Construction</h4>
+                                                <p>Dimensions: 15m × 4m × 1.5m deep</p>
+                                                <p>Infinity edge on north side</p>
+                                                <p>Reinforced concrete (C40/50)</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-critical">!</div>
+                                        Tanking & Waterproofing
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block critical" style="width: 15%; margin-left: 20%;">
+                                            Week 5-7
+                                            <div class="tooltip">
+                                                <h4>Critical Waterproofing</h4>
+                                                <p>Sika MonoTop (3-coat system)</p>
+                                                <p>72hr flood test @ 1.6m depth</p>
+                                                <p>Zero leakage tolerance</p>
+                                                <span class="status status-pending">Critical</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Mosaic Tile Delivery (Bisazza)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 5%; margin-left: 30%;">
+                                            Week 6
+                                            <div class="tooltip">
+                                                <h4>Premium Finish</h4>
+                                                <p>Bisazza glass mosaic (Pearl collection)</p>
+                                                <p>150m² coverage (walls + floor)</p>
+                                                <p>Gradient blue-white pattern</p>
+                                                <span class="status status-pending">Ordered</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Filtration & Heating Systems
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase2" style="width: 25%; margin-left: 40%;">
+                                            Week 8-12
+                                            <div class="tooltip">
+                                                <h4>Pool Equipment</h4>
+                                                <p>Pentair sand filter (commercial)</p>
+                                                <p>Zodiac heat pump (28kW)</p>
+                                                <p>UV + Ozone sanitization</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">💪 Gym & Spa (Days 45-90)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Rubber Flooring Installation
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 15%; margin-left: 50%;">
+                                            Week 10-12
+                                            <div class="tooltip">
+                                                <h4>Gym Flooring</h4>
+                                                <p>Mondo rubber (15mm shock absorption)</p>
+                                                <p>Area: 120m²</p>
+                                                <p>Weight drop tested</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        Equipment Delivery (Technogym)
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 5%; margin-left: 65%;">
+                                            Week 13
+                                            <div class="tooltip">
+                                                <h4>Fitness Equipment</h4>
+                                                <p>Technogym Artis line (8 pieces)</p>
+                                                <p>2× treadmills, 1× bike, weights</p>
+                                                <p>Integrated touchscreens</p>
+                                                <span class="status status-pending">On Order</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Steam Room & Sauna Installation
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase3" style="width: 20%; margin-left: 70%;">
+                                            Week 14-17
+                                            <div class="tooltip">
+                                                <h4>Wellness Facilities</h4>
+                                                <p>Tylö sauna (Finnish, 6-person)</p>
+                                                <p>Steamist steam generator (15kW)</p>
+                                                <p>Himalayan salt wall feature</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="gantt-section">
+                                <div class="gantt-section-title">🎬 Entertainment Lounge (Days 75-120)</div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-delivery">📦</div>
+                                        120" Projection Screen & Projector
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 5%; margin-left: 80%;">
+                                            Week 16
+                                            <div class="tooltip">
+                                                <h4>Home Cinema</h4>
+                                                <p>Sony VPL-VW915ES (4K laser)</p>
+                                                <p>120" motorized screen (Stewart)</p>
+                                                <p>7.2.4 Dolby Atmos setup</p>
+                                                <span class="status status-pending">Ordered</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="gantt-row">
+                                    <div class="gantt-label">
+                                        <div class="task-icon icon-standard">●</div>
+                                        Acoustic Treatment & Seating
+                                    </div>
+                                    <div class="gantt-timeline">
+                                        <div class="gantt-block phase4" style="width: 15%; margin-left: 80%;">
+                                            Week 17-20
+                                            <div class="tooltip">
+                                                <h4>Cinema Finish</h4>
+                                                <p>Acoustic panels (GIK 244 bass traps)</p>
+                                                <p>12× reclining cinema seats</p>
+                                                <p>LED strip ambient lighting</p>
+                                                <span class="status status-pending">Pending</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </main>
+
+    <script>
+        function switchTab(tabId, clickedElement) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active-view');
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        function toggleExpand(element) {
+            const content = element.nextElementSibling;
+            const arrow = element.querySelector('span:last-child');
+
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                arrow.textContent = '▼';
+            } else {
+                content.classList.add('open');
+                arrow.textContent = '▲';
+            }
+        }
+
+        function toggleFilters() {
+            alert('Filter panel - Coming in next update!');
+        }
+
+        function exportReport() {
+            alert('Export functionality - PDF/Excel export coming soon!');
+        }
+
+        function calculateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox.checked');
+            const total = document.querySelectorAll('.checkbox').length;
+            const percent = Math.round((checkboxes.length / total) * 100);
+            alert(`Progress Updated: ${percent}% Complete (${checkboxes.length}/${total} tasks)`);
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Attach nav item click handlers
+            document.querySelectorAll('.nav-item').forEach((item, index) => {
+                const tabs = ['master', 'bathroom', 'bedroom', 'living', 'kitchen', 'mep', 'amenities'];
+                item.addEventListener('click', function () {
+                    switchTab(tabs[index], this);
+                });
+            });
+
+            // Attach checkbox click handlers
+            document.querySelectorAll('.checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', function () {
+                    this.classList.toggle('checked');
+                });
+            });
+
+            // Attach expandable section handlers
+            document.querySelectorAll('.expand-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    toggleExpand(this);
+                });
+            });
+
+            // Attach button handlers
+            const exportBtn = document.querySelector('[onclick="exportReport()"]');
+            if (exportBtn) {
+                exportBtn.removeAttribute('onclick');
+                exportBtn.addEventListener('click', exportReport);
+            }
+
+            const filterBtn = document.querySelector('[onclick="toggleFilters()"]');
+            if (filterBtn) {
+                filterBtn.removeAttribute('onclick');
+                filterBtn.addEventListener('click', toggleFilters);
+            }
+
+            const progressBtn = document.querySelector('[onclick="calculateProgress()"]');
+            if (progressBtn) {
+                progressBtn.removeAttribute('onclick');
+                progressBtn.addEventListener('click', calculateProgress);
+            }
+
+            // Master schedule is already active by default in HTML
+            // switchTab('master');
+        });
+
+    </script>
+
+</body>
+
+</html>
